@@ -6,7 +6,7 @@ import FlipMove from 'react-flip-move';
 
 
 
-export default function CheckoutProduct({ id, image, title, price, rating }) {
+export default function CheckoutProduct({ id, image, title, price, rating, hidden }) {
 
     const [{ basket }, dispatch] = useStateValue()
 
@@ -34,7 +34,8 @@ export default function CheckoutProduct({ id, image, title, price, rating }) {
                             <p>*</p>
                         ))}
                     </p>
-                    <button onClick={removeFromBasket}>Remove from basket</button>
+                    {!hidden &&
+                        <button onClick={removeFromBasket}>Remove from basket</button>}
                 </div>
             </div>
         </FlipMove>

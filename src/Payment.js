@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import './payment.css'
 
 import { useStateValue } from './StateProvider'
 import CheckoutProduct from './CheckoutProduct'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import CurrencyFormat from 'react-currency-format'
+import axios from './axios'
+import { db } from './firebase'
 
 
 export default function Payment() {
@@ -16,18 +18,66 @@ export default function Payment() {
     const [disabled, setDisabled] = useState(true)
     const [processing, setProcessing] = useState('')
     const [succeeded, setSucceeded] = useState(false)
+    const [clientSecret, setClientSecret] = useState(true)
+
+    const history = useHistory()
+
+
+
+    let subtotal = 0
+    basket.map(item => (subtotal += item.price))
+    console.log(subtotal)
+
+    // __________________________
+    useEffect(() => {
+        const getClientSecret = async () => {
+            const response = await axios({
+                method: 'post',
+                url: `/payments/create?total=${subtotal * 100}`
+            })
+            setClientSecret(response.data.clientSecret)
+        }
+        getClientSecret()
+    }, [basket])
+
+    console.log(`the secret is >>>>>`, clientSecret)
+    // __________________________
 
 
     const stripe = useStripe()
     const elements = useElements()
 
     // submit formularza
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         e.preventDefault();
         setProcessing(true)
 
+        const payload = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: elements.getElement(CardElement)
+            }
 
+        }).then(({ paymentIntent }) => {
+            db.collection('users')
+                .doc(user?.uid)
+                .collection('orders')
+                .doc(paymentIntent.id)
+                .set({
+                    basket: basket,
+                    amount: paymentIntent.created,
+                })
+
+            setSucceeded(true)
+            setError(null)
+            setProcessing(false)
+
+            dispatch({
+                type: 'EMPTY_BASKET'
+            })
+
+            history.replace('./orders')
+        })
     }
 
     const handleChange = event => {
@@ -36,9 +86,6 @@ export default function Payment() {
     }
     // __________________________________
 
-    let subtotal = 0
-    basket.map(item => (subtotal += item.price))
-    console.log(subtotal)
 
     return (
         <div className="payment">
@@ -98,11 +145,7 @@ export default function Payment() {
                                             <p>
                                                 Subtotal ({basket?.length} items.): <strong> {subtotal} zł</strong>
                                             </p>
-                                            <button disabled={processing || disabled || succeeded}>
 
-                                                <span> {processing ? <p> Processing </p> : "Kup teraz"}</span>
-
-                                            </button>
                                         </>
 
                                     )}
@@ -115,6 +158,11 @@ export default function Payment() {
 
 
                             </div>
+                            <button disabled={processing || disabled || succeeded}>
+
+                                <span> {processing ? <p> Processing </p> : "Kup teraz"}</span>
+
+                            </button>
                             {error && <div>{error}</div>}
                         </form>
                     </div>

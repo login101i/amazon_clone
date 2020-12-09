@@ -1,0 +1,15 @@
+.orders{
+    padding:20px 50px;
+    background-color: green;
+}
+
+
+.orders h1 {
+    padding:20px 0px;
+}
+
+.orders__order{
+    width:330px;
+    height: 200px;
+    background-color: rgb(210, 210, 228);
+}

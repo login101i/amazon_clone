@@ -45,21 +45,27 @@ export default function Header() {
 
                     <div onClick={authentication} className="header__option">
                         <span className="header__optionLineOne">
-                            Hello {user? user.email: "Guest"}
+                            Hello {user ? user.email : "Guest"}
                         </span>
                         <span className="header__optionLineTwo">
                             {user ? 'Sign out' : "Sign in"}
                         </span>
                     </div>
                 </Link>
-                <div className="header__option">
-                    <span className="header__optionLineOne">
-                        Zwroty
+                <Link to="/orders">
+                    <div className="header__option">
+                        <span className="header__optionLineOne">
+                            Zwroty
                     </span>
-                    <span className="header__optionLineTwo">
-                        i zamówienia
+
+
+                        <span className="header__optionLineTwo">
+                            i zamówienia
                     </span>
-                </div>
+
+
+                    </div>
+                </Link>
 
                 <div className="header__option">
                     <span className="header__optionLineOne">
@@ -78,6 +84,6 @@ export default function Header() {
                 </Link>
 
             </div>
-        </div>
+        </div >
     )
 }

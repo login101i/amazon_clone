@@ -36,3 +36,21 @@ border-bottom: 1px solid lightgrey;
     flex:0.8
 }
 
+.payment__details >form {
+    max-width: 444px;
+}
+
+.payment__details > h3{
+    padding-bottom: 20px;
+}
+
+.payment__details > form > div >button{
+background:#f0c14b;
+width:100%;
+border-radius:2px;
+height:20px;
+font-weight: bolder;
+margin-top:10px;
+color:#111
+}
+
